@@ -1,0 +1,17 @@
+{
+  "name": "Polymarket Feed",
+  "short_name": "PolyFeed",
+  "description": "Doomscroll through the odds of everything happening in the world",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#3B82F6",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}
