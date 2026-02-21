@@ -32,9 +32,16 @@ export default function MarketFeed({ markets }: MarketFeedProps) {
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [currentIndex])
 
-  // Handle wheel scroll
+  // Handle wheel scroll with debouncing to prevent too fast scrolling
+  const lastScrollTime = useRef(0)
   const handleWheel = (e: WheelEvent) => {
     e.preventDefault()
+    const now = Date.now()
+    
+    // Debounce: prevent scrolling faster than once per 800ms
+    if (now - lastScrollTime.current < 800) return
+    
+    lastScrollTime.current = now
     if (e.deltaY > 0) {
       goToNext()
     } else if (e.deltaY < 0) {
@@ -59,13 +66,22 @@ export default function MarketFeed({ markets }: MarketFeedProps) {
     touchEndY.current = e.touches[0].clientY
   }
 
+  // Touch debouncing
+  const lastTouchTime = useRef(0)
   const handleTouchEnd = () => {
+    const now = Date.now()
+    
+    // Debounce: prevent swiping faster than once per 600ms
+    if (now - lastTouchTime.current < 600) return
+    
     const diff = touchStartY.current - touchEndY.current
     const threshold = 50
 
     if (diff > threshold) {
+      lastTouchTime.current = now
       goToNext()
     } else if (diff < -threshold) {
+      lastTouchTime.current = now
       goToPrevious()
     }
   }
@@ -127,38 +143,15 @@ export default function MarketFeed({ markets }: MarketFeedProps) {
 
       {/* Navigation hints */}
       <div className="absolute bottom-8 left-0 right-0 flex flex-col items-center gap-2 pointer-events-none z-10">
-        {currentIndex < markets.length - 1 && (
-          <motion.div
-            animate={{ y: [0, 10, 0] }}
-            transition={{ repeat: Infinity, duration: 1.5 }}
-            className="text-white/50 text-sm"
-          >
-            <svg
-              className="w-6 h-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M19 9l-7 7-7-7"
-              />
-            </svg>
-          </motion.div>
-        )}
-        <div className="text-white/30 text-xs">
+        <div className="text-white/20 text-[10px] uppercase tracking-wider">
           {currentIndex + 1} / {markets.length}
         </div>
       </div>
 
       {/* Top branding */}
-      <div className="absolute top-6 left-0 right-0 flex justify-center pointer-events-none z-10">
-        <div className="text-white font-bold text-2xl tracking-tight">
-          <span className="bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 text-transparent bg-clip-text">
-            Polymarket Feed
-          </span>
+      <div className="absolute top-8 left-8 pointer-events-none z-10">
+        <div className="text-white font-light text-sm uppercase tracking-widest">
+          Polymarket
         </div>
       </div>
     </div>

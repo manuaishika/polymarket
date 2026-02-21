@@ -1,35 +1,40 @@
 import axios from 'axios'
 import type { Market } from '@/types/market'
 
+const CLOB_API = 'https://clob.polymarket.com'
 const GAMMA_API = 'https://gamma-api.polymarket.com'
-const STRAPI_API = 'https://strapi-matic.poly.market'
 
-// Fetch trending/popular markets
-export async function fetchMarkets(limit: number = 50): Promise<Market[]> {
+// Fetch trending/popular markets from REAL Polymarket API
+export async function fetchMarkets(limit: number = 100): Promise<Market[]> {
   try {
-    // Use the Gamma API to fetch markets
+    // Fetch from Gamma API - this is the real endpoint
     const response = await axios.get(`${GAMMA_API}/markets`, {
       params: {
         limit,
         active: true,
         closed: false,
+        archived: false,
       },
+      timeout: 5000,
     })
 
-    const markets = response.data
-    
+    if (!response.data || response.data.length === 0) {
+      console.warn('No markets returned from API, using mock data')
+      return getMockMarkets()
+    }
+
     // Transform the data to our Market type
-    return markets.map((market: any) => ({
+    const markets = response.data.map((market: any) => ({
       id: market.condition_id || market.id,
       question: market.question,
       description: market.description,
       outcomes: market.outcomes || ['Yes', 'No'],
-      outcomePrices: market.outcomePrices || ['0.5', '0.5'],
+      outcomePrices: market.outcomePrices || market.outcome_prices || ['0.5', '0.5'],
       volume: market.volume || '0',
       liquidity: market.liquidity || '0',
-      endDate: market.end_date_iso || market.endDate,
+      endDate: market.end_date_iso || market.endDate || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
       image: market.image,
-      category: market.category || market.market_slug,
+      category: market.category || market.groupItemTitle || 'Markets',
       tags: market.tags || [],
       active: market.active !== false,
       closed: market.closed || false,
@@ -37,9 +42,12 @@ export async function fetchMarkets(limit: number = 50): Promise<Market[]> {
       featured: market.featured || false,
       volume24hr: market.volume24hr || '0',
     }))
+
+    console.log(`Fetched ${markets.length} markets from Polymarket API`)
+    return markets
   } catch (error) {
-    console.error('Error fetching markets:', error)
-    // Return mock data as fallback
+    console.error('Error fetching from Polymarket API:', error)
+    console.log('Falling back to mock data')
     return getMockMarkets()
   }
 }

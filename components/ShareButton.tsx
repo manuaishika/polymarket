@@ -41,9 +41,9 @@ export default function ShareButton({ marketQuestion, probability }: ShareButton
   return (
     <motion.button
       onClick={handleShare}
-      className="relative bg-white/10 backdrop-blur-md hover:bg-white/20 text-white rounded-full p-3 border border-white/20 transition-colors"
-      whileHover={{ scale: 1.1 }}
-      whileTap={{ scale: 0.9 }}
+      className="relative bg-transparent hover:bg-white/10 text-white border border-white/20 p-2 transition-colors"
+      whileHover={{ scale: 1.05 }}
+      whileTap={{ scale: 0.95 }}
     >
       <AnimatePresence mode="wait">
         {showCopied ? (
@@ -53,7 +53,7 @@ export default function ShareButton({ marketQuestion, probability }: ShareButton
             animate={{ scale: 1, rotate: 0 }}
             exit={{ scale: 0, rotate: 180 }}
           >
-            <FiCheck className="w-5 h-5" />
+            <FiCheck className="w-4 h-4" />
           </motion.div>
         ) : (
           <motion.div
@@ -62,7 +62,7 @@ export default function ShareButton({ marketQuestion, probability }: ShareButton
             animate={{ scale: 1, rotate: 0 }}
             exit={{ scale: 0, rotate: -180 }}
           >
-            <FiShare2 className="w-5 h-5" />
+            <FiShare2 className="w-4 h-4" />
           </motion.div>
         )}
       </AnimatePresence>
@@ -72,7 +72,7 @@ export default function ShareButton({ marketQuestion, probability }: ShareButton
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -10 }}
-          className="absolute -top-10 left-1/2 -translate-x-1/2 bg-white text-black text-xs font-semibold px-3 py-1 rounded-full whitespace-nowrap"
+          className="absolute -top-8 left-1/2 -translate-x-1/2 bg-white text-black text-[10px] font-normal px-2 py-1 whitespace-nowrap"
         >
           Copied to clipboard!
         </motion.div>
